@@ -9,12 +9,13 @@
   </a>
   <h1>Golang WebAssembly Async Loader</h1>
   <p>Generates a WASM package from Golang and provides an async interface for working with it</p>
+  <p>golang-wasm-async-loader2 is a fork of golang-wasm-async-loader updated for Golang v1.13</p>
 </div>
 
 <h2 align="center">Install</h2>
 
 ```bash
-npm install --save-dev golang-wasm-async-loader
+npm install --save-dev golang-wasm-async-loader2
 ```
 
 This is a loader for [webpack](https://webpack.js.org/) that is used for generating [WebAssembly](https://webassembly.org/) (aka WASM) bundles from [Go](https://golang.org).
@@ -32,7 +33,7 @@ module.exports = {
         rules: [
             {
                 test: /\.go/,
-                use: ['golang-wasm-async-loader']
+                use: ['golang-wasm-async-loader2']
             }
         ]
     },
@@ -64,9 +65,9 @@ Here's the `main.go` file:
 package main
 
 import (
-	"strconv"
-	"syscall/js"
-	"github.com/aaronpowell/webpack-golang-wasm-async-loader/gobridge"
+  "strconv"
+  "syscall/js"
+  "github.com/happybeing/webpack-golang-wasm-async-loader/gobridge"
 )
 
 func add(i []js.Value) (interface{},error) {
@@ -106,9 +107,9 @@ In JavaScript a global object is registered as `__gobridge__` which the registra
 
 ## Examples
 
-Examples are provided for a CLI using NodeJS and for web using either React or Svelte. These are in the [`examples`](https://github.com/aaronpowell/webpack-golang-wasm-async-loader/tree/master/examples) directory, each with its own development and build environment.
+Examples are provided for a CLI using NodeJS and for web using either React or Svelte. These are in the [`examples`](https://github.com/happybeing/webpack-golang-wasm-async-loader/tree/master/examples) directory, each with its own development and build environment.
 
-To make an example stand-alone, copy of the corresponding example to a new directory (outside the plugin directory) and then modify the example's `webpack.config.js` so that the `.go` loader refers to this plugin. Then use `npm add --save-dev webpack-golang-wasm-async-loader` to add it to the example's dependencies.
+To make an example stand-alone, copy of the corresponding example to a new directory (outside the plugin directory) and then modify the example's `webpack.config.js` so that the `.go` loader refers to this plugin. Then use `npm add --save-dev golang-wasm-async-loader2` to add it to the example's dependencies.
 
 ## Environment
 
@@ -130,13 +131,11 @@ MIT
 
 # Credit
 
-Aaron Powell
+Aaron Powell (update to golang v1.13 by Mark Hughes)
 
-[build]: https://aaronpowell.visualstudio.com/webpack-golang-wasm-async-loader/_apis/build/status/aaronpowell.webpack-golang-wasm-async-loader?branchName=master&label=Built%20on%20Azure%20🐱%E2%80%8D💻
-[build-url]: https://aaronpowell.visualstudio.com/webpack-golang-wasm-async-loader/_build/latest?definitionId=16?branchName=master
 
-[npm]: https://img.shields.io/npm/v/golang-wasm-async-loader.svg
-[npm-url]: https://npmjs.com/package/golang-wasm-async-loader
+[npm]: https://img.shields.io/npm/v/golang-wasm-async-loader2.svg
+[npm-url]: https://npmjs.com/package/golang-wasm-async-loader2
 
-[node]: https://img.shields.io/node/v/golang-wasm-async-loader.svg
+[node]: https://img.shields.io/node/v/golang-wasm-async-loader2.svg
 [node-url]: https://nodejs.org
