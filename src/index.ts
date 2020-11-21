@@ -26,9 +26,19 @@ function loader(this: webpack.loader.LoaderContext, contents: string) {
     cwd: resourceDirectory
 };
 
-  const goBin = getGoBin(opts.env.GOROOT);
+  // // TODO: remove debug code...
+  let goBin = "/usr/bin/env";
+  execFile("/usr/bin/env", [], opts, (err, out) => {
+      if (out) {
+          console.log(out);
+          return;
+      }
+  });
+
+  goBin = getGoBin(opts.env.GOROOT);
   const outFile = `${this.resourcePath}.wasm`;
-  const args = ["build", "-o", "-a", outFile, this.resourcePath];
+  // const args = ["build", "-x", "-a", "-v", "-o", outFile, this.resourcePath];  // TODO: remove this
+  const args = ["build", "-o", outFile, this.resourcePath];
 
   execFile(goBin, args, opts, (err) => {
     if (err) {
