@@ -12,6 +12,8 @@ const getGoBin = (root: string) => `${root}/bin/go`;
 function loader(this: webpack.loader.LoaderContext, contents: string) {
   const cb = this.async();
 
+  let resourceDirectory = this.resourcePath.substr(0, this.resourcePath.lastIndexOf("/"));
+
   const opts = {
     env: {
       GO111MODULE: "on",
@@ -20,8 +22,9 @@ function loader(this: webpack.loader.LoaderContext, contents: string) {
       GOCACHE: join(__dirname, "./.gocache"),
       GOOS: "js",
       GOARCH: "wasm"
-    }
-  };
+    },
+    cwd: resourceDirectory
+};
 
   const goBin = getGoBin(opts.env.GOROOT);
   const outFile = `${this.resourcePath}.wasm`;
