@@ -1,7 +1,7 @@
 {
   "name": "golang-wasm-async-loader2",
-  "version": "1.0.6",
-  "description": "Golang v1.13 Wasm loader for webpack that generates an async pattern for working with Go's WebAssembly output",
+  "version": "1.1.0",
+  "description": "Golang Wasm loader for webpack that generates an async pattern for working with Go's WebAssembly output",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",

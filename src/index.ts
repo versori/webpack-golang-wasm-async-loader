@@ -26,8 +26,7 @@ function loader(this: webpack.loader.LoaderContext, contents: string) {
     cwd: resourceDirectory
 };
 
-  // // TODO: remove debug code...
-  let goBin = "/usr/bin/env";
+  // TODO: remove debug code...
   execFile("/usr/bin/env", [], opts, (err, out) => {
       if (out) {
           console.log(out);
@@ -35,7 +34,7 @@ function loader(this: webpack.loader.LoaderContext, contents: string) {
       }
   });
 
-  goBin = getGoBin(opts.env.GOROOT);
+  const goBin = getGoBin(opts.env.GOROOT);
   const outFile = `${this.resourcePath}.wasm`;
   // const args = ["build", "-x", "-a", "-v", "-o", outFile, this.resourcePath];  // TODO: remove this
   const args = ["build", "-o", outFile, this.resourcePath];
@@ -55,6 +54,7 @@ function loader(this: webpack.loader.LoaderContext, contents: string) {
       null,
       [
         "require('!",
+        // join(process.env.GOROOT, "/misc/wasm/wasm_exec.js"),
         join(__dirname, "..", "lib", "wasm_exec.js"),
         "');",
         "import gobridge from '",
