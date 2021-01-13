@@ -3,11 +3,9 @@ import {readFileSync, unlinkSync} from "fs";
 import {basename, join} from "path";
 import {execFile} from "child_process";
 
-const proxyBuilder = (filename: string) => `
-export default gobridge(fetch('${filename}').then(response => response.arrayBuffer()));
-`;
+export const getGoBin = (root: string) => join(root, "bin", "go");
 
-const getGoBin = (root: string) => `${root}/bin/go`;
+export const getGoWasmExec = (root: string) => join(root, "misc", "wasm", "wasm_exec.js");
 
 function loader(this: webpack.loader.LoaderContext, contents: string) {
   const cb = this.async();
@@ -24,20 +22,14 @@ function loader(this: webpack.loader.LoaderContext, contents: string) {
       GOARCH: "wasm"
     },
     cwd: resourceDirectory
-};
-
-  // TODO: remove debug code...
-  execFile("/usr/bin/env", [], opts, (err, out) => {
-      if (out) {
-          console.log(out);
-          return;
-      }
-  });
+  };
+  const outFile = `${this.resourcePath}.wasm`;
+  const args = ["build", "-o", outFile, this.resourcePath];
 
   const goBin = getGoBin(opts.env.GOROOT);
-  const outFile = `${this.resourcePath}.wasm`;
-  // const args = ["build", "-x", "-a", "-v", "-o", outFile, this.resourcePath];  // TODO: remove this
-  const args = ["build", "-o", outFile, this.resourcePath];
+  // TODO: const libPath = getGoWasmExec(opts.env.GOROOT)
+  const libPath = join(__dirname, "..", "lib", "wasm_exec.js");
+  const bridgePath = join(__dirname, "..", "dist", "gobridge.js");
 
   execFile(goBin, args, opts, (err) => {
     if (err) {
@@ -45,24 +37,29 @@ function loader(this: webpack.loader.LoaderContext, contents: string) {
       return;
     }
 
-    let out = readFileSync(outFile);
-    unlinkSync(outFile);
-    const emittedFilename = basename(this.resourcePath, ".go") + ".wasm";
+    // TODO: only here for debugging; remove later or use env var!
+    console.info("[Go WASM loader] debug info", { goBin, args, opts, err });
+
+    const out = readFileSync(outFile);
+    try {
+      unlinkSync(outFile);
+    } catch (e) {
+      console.error("[Go WASM loader] unlinking encountered error:", { e });
+    }
+
+    const emitFileBasename = basename(this.resourcePath, ".go");
+    const emittedFilename = `${emitFileBasename}.wasm`;
     this.emitFile(emittedFilename, out, null);
 
-    cb(
-      null,
-      [
-        "require('!",
-        // join(process.env.GOROOT, "/misc/wasm/wasm_exec.js"),
-        join(__dirname, "..", "lib", "wasm_exec.js"),
-        "');",
-        "import gobridge from '",
-        join(__dirname, "..", "dist", "gobridge.js"),
-        "';",
-        proxyBuilder(emittedFilename)
-      ].join("")
-    );
+    const proxied = `
+      require('!${libPath}');
+      import gobridge from '${bridgePath}';
+      console.info({ wpPubPath:__webpack_public_path__ }, window.navigator);
+      const file = fetch(__webpack_public_path__ + '${emittedFilename}');
+      const buffer = file.then(res => res.arrayBuffer());
+      export default gobridge(buffer);
+    `;
+    cb(null, proxied);
   });
 }
 
