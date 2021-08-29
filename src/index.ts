@@ -7,7 +7,7 @@ export const getGoBin = (root: string) => join(root, "bin", "go");
 
 export const getGoWasmExec = (root: string) => join(root, "misc", "wasm", "wasm_exec.js");
 
-function loader(this: webpack.loader.LoaderContext, contents: string) {
+function loader(this: webpack.LoaderContext<any>, contents: string) {
   const cb = this.async();
 
   let resourceDirectory = this.resourcePath.substr(0, this.resourcePath.lastIndexOf("/"));
