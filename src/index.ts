@@ -54,9 +54,13 @@ function loader(this: webpack.LoaderContext<any>, contents: string) {
     const proxied = `
       require('!${libPath}');
       import gobridge from '${bridgePath}';
-      const file = fetch(__webpack_public_path__ + '${emittedFilename}');
-      const buffer = file.then(res => res.arrayBuffer());
-      export default gobridge(buffer);
+      let exportee = {}
+      if (typeof window !== 'undefined') {
+        const file = fetch(__webpack_public_path__ + '${emittedFilename}');
+        const buffer = file.then(res => res.arrayBuffer());
+        exportee= gobridge(buffer);
+      }
+      export default exportee;
     `;
     cb(null, proxied);
   });
